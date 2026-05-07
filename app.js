@@ -20,7 +20,6 @@ const MODES = {
 };
 
 const STORAGE_KEY = "chrome-pomodoro-settings-v1";
-const RING_LENGTH = 2 * Math.PI * 96;
 
 const defaults = {
   focusMinutes: 25,
@@ -32,10 +31,10 @@ const defaults = {
 };
 
 const elements = {
+  timerFace: document.querySelector(".timer-face"),
   timeDisplay: document.querySelector("#timeDisplay"),
   modeLabel: document.querySelector("#modeLabel"),
   timerState: document.querySelector("#timerState"),
-  progressValue: document.querySelector("#progressValue"),
   sessionStatus: document.querySelector("#sessionStatus"),
   startPauseButton: document.querySelector("#startPauseButton"),
   resetButton: document.querySelector("#resetButton"),
@@ -72,7 +71,6 @@ let audioContext = null;
 initialize();
 
 function initialize() {
-  elements.progressValue.style.strokeDasharray = RING_LENGTH;
   syncSettingsForm();
   updateNotificationUi();
   bindEvents();
@@ -235,9 +233,14 @@ function render() {
   const config = getModeConfig(currentMode);
   const totalSeconds = getModeSeconds(currentMode);
   const progress = totalSeconds === 0 ? 0 : 1 - remainingSeconds / totalSeconds;
-  const dashOffset = RING_LENGTH * Math.min(Math.max(progress, 0), 1);
+  const clampedProgress = Math.min(Math.max(progress, 0), 1);
+  const topSandScale = Math.max(0.08, 1 - clampedProgress);
+  const bottomSandScale = Math.max(0.14, clampedProgress);
 
   document.body.dataset.mode = currentMode;
+  document.body.dataset.running = String(isRunning);
+  elements.timerFace.style.setProperty("--sand-top-scale", topSandScale.toFixed(3));
+  elements.timerFace.style.setProperty("--sand-bottom-scale", bottomSandScale.toFixed(3));
   elements.timeDisplay.textContent = formatTime(remainingSeconds);
   elements.modeLabel.textContent = config.label;
   elements.timerState.textContent = getStateText();
@@ -248,7 +251,6 @@ function render() {
     "aria-label",
     currentMode === "focus" ? "Breaks unlock after focus" : "Skip break",
   );
-  elements.progressValue.style.strokeDashoffset = dashOffset;
   elements.completedFocus.textContent = completedFocusCount;
   elements.nextMode.textContent = getModeConfig(getNextMode(currentMode, currentMode === "focus")).label;
   elements.roundProgress.textContent = `${getCurrentRound()} / ${settings.roundsBeforeLongBreak}`;

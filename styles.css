@@ -180,72 +180,146 @@ body[data-mode="longBreak"] .flow-step.is-active {
 
 .timer-face {
   position: relative;
-  min-height: 390px;
+  min-height: 520px;
   display: grid;
   place-items: center;
+  --sand-top-scale: 1;
+  --sand-bottom-scale: 0.14;
 }
 
-.progress-ring {
-  width: min(420px, 72vw, 100%);
+.hourglass {
+  width: min(500px, 75vw, 100%);
   max-width: 100%;
-  aspect-ratio: 1;
-  transform: rotate(-90deg);
+  aspect-ratio: 260 / 380;
+  filter: drop-shadow(0 18px 34px rgba(25, 76, 73, 0.14));
 }
 
-.progress-track,
-.progress-value {
-  fill: none;
-  stroke-width: 12;
-}
-
-.progress-track {
-  stroke: rgba(104, 112, 124, 0.16);
-}
-
-.progress-value {
+.hourglass-cap {
+  fill: url("#glassGlow");
   stroke: var(--focus);
-  stroke-linecap: round;
-  stroke-dasharray: 603.19;
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.35s ease, stroke 0.25s ease;
+  stroke-width: 5;
 }
 
-body[data-mode="shortBreak"] .progress-value {
+.hourglass-glass {
+  fill: rgba(255, 255, 255, 0.38);
+  stroke: var(--focus);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hourglass-sand {
+  fill: url("#sandFill");
+  opacity: 0.9;
+  transition: transform 0.35s ease;
+}
+
+.hourglass-top-sand {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(var(--sand-top-scale));
+}
+
+.hourglass-bottom-sand {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(var(--sand-bottom-scale));
+}
+
+.hourglass-highlight {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.76);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.sand-stream {
+  opacity: 0.36;
+  transition: opacity 0.2s ease;
+}
+
+.sand-stream line {
+  stroke: #b7dfda;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 8 10;
+}
+
+.sand-stream circle {
+  fill: #b7dfda;
+}
+
+body[data-running="true"] .sand-stream {
+  opacity: 0.92;
+}
+
+body[data-running="true"] .sand-stream line {
+  animation: falling-sand 0.7s linear infinite;
+}
+
+body[data-mode="shortBreak"] .hourglass-cap,
+body[data-mode="shortBreak"] .hourglass-glass {
   stroke: var(--break);
 }
 
-body[data-mode="longBreak"] .progress-value {
+body[data-mode="longBreak"] .hourglass-cap,
+body[data-mode="longBreak"] .hourglass-glass {
   stroke: var(--long);
+}
+
+@keyframes falling-sand {
+  to {
+    stroke-dashoffset: -18;
+  }
 }
 
 .timer-copy {
   position: absolute;
-  top: 50%;
+  top: 31.5%;
   left: 50%;
-  width: min(420px, 72vw, 100%);
-  aspect-ratio: 1;
+  width: min(340px, 52vw, 72%);
   transform: translate(-50%, -50%);
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 10px;
+  gap: 8px;
   text-align: center;
   pointer-events: none;
   container-type: inline-size;
 }
 
 .timer-copy p,
-.timer-copy span {
+.hourglass-state {
   margin: 0;
-  color: var(--muted);
+  color: var(--focus);
   font-weight: 800;
 }
 
+body[data-mode="shortBreak"] .timer-copy p,
+body[data-mode="shortBreak"] .hourglass-state {
+  color: var(--break);
+}
+
+body[data-mode="longBreak"] .timer-copy p,
+body[data-mode="longBreak"] .hourglass-state {
+  color: var(--long);
+}
+
+.hourglass-state {
+  position: absolute;
+  top: 67%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  pointer-events: none;
+}
+
 .time-display {
-  max-width: 76cqw;
+  max-width: 100cqw;
   min-width: 0;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(3.2rem, 20cqw, 5.7rem);
+  font-size: clamp(2.8rem, 20cqw, 5.2rem);
   font-weight: 900;
   line-height: 0.9;
   white-space: nowrap;

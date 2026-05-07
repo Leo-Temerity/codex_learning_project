@@ -33,15 +33,50 @@
         </div>
 
         <div class="timer-face" aria-live="polite">
-          <svg class="progress-ring" viewBox="0 0 220 220" aria-hidden="true">
-            <circle class="progress-track" cx="110" cy="110" r="96"></circle>
-            <circle class="progress-value" id="progressValue" cx="110" cy="110" r="96"></circle>
+          <svg class="hourglass" viewBox="0 0 260 380" aria-hidden="true">
+            <defs>
+              <clipPath id="topBulbClip">
+                <path d="M48 52 C31 86 38 121 66 151 C82 168 111 177 121 196 C125 203 126 210 130 222 C134 210 135 203 139 196 C149 177 178 168 194 151 C222 121 229 86 212 52 Z"></path>
+              </clipPath>
+              <clipPath id="bottomBulbClip">
+                <path d="M130 198 C126 212 116 225 102 239 C78 262 56 292 48 328 L212 328 C204 292 182 262 158 239 C144 225 134 212 130 198 Z"></path>
+              </clipPath>
+              <linearGradient id="glassGlow" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.82"></stop>
+                <stop offset="1" stop-color="#d7f3f0" stop-opacity="0.42"></stop>
+              </linearGradient>
+              <linearGradient id="sandFill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#dff5f1"></stop>
+                <stop offset="1" stop-color="#b7dfda"></stop>
+              </linearGradient>
+            </defs>
+
+            <rect class="hourglass-cap" x="26" y="18" width="208" height="34" rx="9"></rect>
+            <rect class="hourglass-cap" x="26" y="328" width="208" height="34" rx="9"></rect>
+
+            <path class="hourglass-glass" d="M48 52 C31 86 38 121 66 151 C82 168 111 177 121 196 C125 203 126 210 113 222 C101 234 79 244 65 259 C47 278 42 306 48 328 L212 328 C218 306 213 278 195 259 C181 244 159 234 147 222 C134 210 135 203 139 196 C149 177 178 168 194 151 C222 121 229 86 212 52 Z"></path>
+
+            <g clip-path="url(#topBulbClip)">
+              <path class="hourglass-sand hourglass-top-sand" d="M34 161 C75 143 105 169 134 154 C160 140 187 147 226 163 L226 192 L34 192 Z"></path>
+            </g>
+            <g clip-path="url(#bottomBulbClip)">
+              <path class="hourglass-sand hourglass-bottom-sand" d="M35 316 C69 289 94 318 126 294 C155 273 176 312 225 312 L225 328 L35 328 Z"></path>
+            </g>
+
+            <path class="hourglass-highlight" d="M65 64 C48 88 52 122 80 148"></path>
+
+            <g class="sand-stream">
+              <line x1="130" y1="184" x2="130" y2="269"></line>
+              <circle cx="130" cy="198" r="2.5"></circle>
+              <circle cx="130" cy="226" r="2.5"></circle>
+              <circle cx="130" cy="254" r="2.5"></circle>
+            </g>
           </svg>
           <div class="timer-copy">
             <p id="modeLabel">Focus</p>
             <div class="time-display" id="timeDisplay">25:00</div>
-            <span id="timerState">Ready</span>
           </div>
+          <span class="hourglass-state" id="timerState">Ready</span>
         </div>
 
         <div class="controls" aria-label="Timer controls">
