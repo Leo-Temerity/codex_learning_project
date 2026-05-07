@@ -56,6 +56,7 @@ const elements = {
   restoreDefaultsButton: document.querySelector("#restoreDefaultsButton"),
   completedFocus: document.querySelector("#completedFocus"),
   roundProgress: document.querySelector("#roundProgress"),
+  currentModeSummary: document.querySelector("#currentModeSummary"),
   nextMode: document.querySelector("#nextMode"),
 };
 
@@ -252,6 +253,7 @@ function render() {
     currentMode === "focus" ? "Breaks unlock after focus" : "Skip break",
   );
   elements.completedFocus.textContent = completedFocusCount;
+  elements.currentModeSummary.textContent = config.label;
   elements.nextMode.textContent = getModeConfig(getNextMode(currentMode, currentMode === "focus")).label;
   elements.roundProgress.textContent = `${getCurrentRound()} / ${settings.roundsBeforeLongBreak}`;
   elements.sessionStatus.textContent = getSessionStatus();
