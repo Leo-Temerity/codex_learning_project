@@ -20,6 +20,7 @@ const MODES = {
 };
 
 const STORAGE_KEY = "chrome-pomodoro-settings-v1";
+const TASKS_STORAGE_KEY = "chrome-pomodoro-tasks-v1";
 
 const defaults = {
   focusMinutes: 25,
@@ -58,9 +59,19 @@ const elements = {
   roundProgress: document.querySelector("#roundProgress"),
   currentModeSummary: document.querySelector("#currentModeSummary"),
   nextMode: document.querySelector("#nextMode"),
+  taskForm: document.querySelector("#taskForm"),
+  taskInput: document.querySelector("#taskInput"),
+  taskCount: document.querySelector("#taskCount"),
+  activeTaskSummary: document.querySelector("#activeTaskSummary"),
+  taskList: document.querySelector("#taskList"),
+  cutTaskList: document.querySelector("#cutTaskList"),
+  emptyTasks: document.querySelector("#emptyTasks"),
+  emptyCutTasks: document.querySelector("#emptyCutTasks"),
+  restoreLastTaskButton: document.querySelector("#restoreLastTaskButton"),
 };
 
 let settings = loadSettings();
+let tasks = loadTasks();
 let currentMode = "focus";
 let isRunning = false;
 let targetTime = null;
@@ -76,6 +87,7 @@ function initialize() {
   updateNotificationUi();
   bindEvents();
   resetTimer("focus");
+  renderTasks();
 }
 
 function bindEvents() {
@@ -85,6 +97,10 @@ function bindEvents() {
   elements.restoreDefaultsButton.addEventListener("click", restoreDefaults);
   elements.notificationButton.addEventListener("click", enableNotifications);
   elements.settingsForm.addEventListener("submit", (event) => event.preventDefault());
+  elements.taskForm.addEventListener("submit", addTask);
+  elements.taskList.addEventListener("click", handleTaskListClick);
+  elements.cutTaskList.addEventListener("click", handleTaskListClick);
+  elements.restoreLastTaskButton.addEventListener("click", restoreLastCutTask);
 
   [elements.focusMinutes, elements.shortBreakMinutes, elements.longBreakMinutes, elements.roundsBeforeLongBreak].forEach((input) => {
     input.addEventListener("input", () => updateNumericSetting(input));
@@ -102,6 +118,105 @@ function bindEvents() {
       tick();
     }
   });
+}
+
+function addTask(event) {
+  event.preventDefault();
+
+  const title = elements.taskInput.value.trim().replace(/\s+/g, " ");
+
+  if (!title) {
+    elements.taskInput.focus();
+    return;
+  }
+
+  tasks.unshift({
+    id: createTaskId(),
+    title,
+    isCut: false,
+    createdAt: Date.now(),
+    cutAt: null,
+  });
+
+  elements.taskInput.value = "";
+  saveTasks();
+  renderTasks();
+}
+
+function handleTaskListClick(event) {
+  const button = event.target.closest("button[data-task-action]");
+
+  if (!button) {
+    return;
+  }
+
+  const task = tasks.find((item) => item.id === button.dataset.taskId);
+
+  if (!task) {
+    return;
+  }
+
+  if (button.dataset.taskAction === "cut") {
+    cutTask(task.id);
+  }
+
+  if (button.dataset.taskAction === "restore") {
+    restoreTask(task.id);
+  }
+
+  if (button.dataset.taskAction === "archive") {
+    archiveTask(task.id);
+  }
+}
+
+function cutTask(taskId) {
+  tasks = tasks.map((task) => {
+    if (task.id !== taskId) {
+      return task;
+    }
+
+    return {
+      ...task,
+      isCut: true,
+      cutAt: Date.now(),
+    };
+  });
+
+  saveTasks();
+  renderTasks();
+}
+
+function restoreTask(taskId) {
+  tasks = tasks.map((task) => {
+    if (task.id !== taskId) {
+      return task;
+    }
+
+    return {
+      ...task,
+      isCut: false,
+      cutAt: null,
+    };
+  });
+
+  saveTasks();
+  renderTasks();
+}
+
+function restoreLastCutTask() {
+  const lastCutTask = getCutTasks()[0];
+
+  if (!lastCutTask) {
+    return;
+  }
+
+  restoreTask(lastCutTask.id);
+}
+
+function archiveTask(taskId) {
+  tasks = tasks.filter((task) => task.id !== taskId || !task.isCut);
+  saveTasks();
+  renderTasks();
 }
 
 function toggleTimer() {
@@ -262,6 +377,93 @@ function render() {
   Object.entries(elements.flowSteps).forEach(([mode, step]) => {
     step.classList.toggle("is-active", mode === currentMode);
   });
+}
+
+function renderTasks() {
+  const activeTasks = getActiveTasks();
+  const cutTasks = getCutTasks();
+
+  elements.taskCount.textContent = `${activeTasks.length} active`;
+  elements.activeTaskSummary.textContent = `${activeTasks.length} ${activeTasks.length === 1 ? "item" : "items"}`;
+  elements.emptyTasks.hidden = activeTasks.length > 0;
+  elements.emptyCutTasks.hidden = cutTasks.length > 0;
+  elements.restoreLastTaskButton.disabled = cutTasks.length === 0;
+  elements.taskList.replaceChildren(...activeTasks.map((task) => createTaskElement(task)));
+  elements.cutTaskList.replaceChildren(...cutTasks.map((task) => createTaskElement(task)));
+}
+
+function createTaskElement(task) {
+  const item = document.createElement("li");
+  item.className = task.isCut ? "task-item is-cut" : "task-item";
+
+  const title = document.createElement("span");
+  title.className = "task-title";
+  title.textContent = task.title;
+
+  const actions = document.createElement("div");
+  actions.className = "task-actions";
+
+  if (task.isCut) {
+    actions.append(
+      createTaskActionButton({
+        task,
+        action: "restore",
+        label: "Put back",
+        className: "quiet-button task-action-button",
+      }),
+      createTaskActionButton({
+        task,
+        action: "archive",
+        label: "Archive",
+        className: "quiet-button task-action-button archive-task-button",
+      }),
+    );
+  } else {
+    actions.append(
+      createTaskActionButton({
+        task,
+        action: "cut",
+        label: "✂",
+        title: "Cut out",
+        className: "icon-button task-action-button",
+      }),
+    );
+  }
+
+  item.append(title, actions);
+
+  return item;
+}
+
+function createTaskActionButton({ task, action, label, title = label, className }) {
+  const button = document.createElement("button");
+  button.className = className;
+  button.type = "button";
+  button.dataset.taskId = task.id;
+  button.dataset.taskAction = action;
+  button.title = title;
+  button.setAttribute("aria-label", `${title} ${task.title}`);
+  button.textContent = label;
+
+  return button;
+}
+
+function getActiveTasks() {
+  return tasks.filter((task) => !task.isCut);
+}
+
+function getCutTasks() {
+  return tasks
+    .filter((task) => task.isCut)
+    .sort((first, second) => second.cutAt - first.cutAt);
+}
+
+function createTaskId() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function getCurrentRound() {
@@ -441,6 +643,28 @@ function loadSettings() {
   }
 }
 
+function loadTasks() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(TASKS_STORAGE_KEY));
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .map((task) => ({
+        id: typeof task?.id === "string" ? task.id : createTaskId(),
+        title: typeof task?.title === "string" ? task.title.trim() : "",
+        isCut: Boolean(task?.isCut),
+        createdAt: Number.isFinite(task?.createdAt) ? task.createdAt : Date.now(),
+        cutAt: Number.isFinite(task?.cutAt) ? task.cutAt : null,
+      }))
+      .filter((task) => task.title);
+  } catch {
+    return [];
+  }
+}
+
 function sanitizeStoredMinutes(value, fallback, min, max) {
   const number = Number.parseInt(value, 10);
 
@@ -453,4 +677,8 @@ function sanitizeStoredMinutes(value, fallback, min, max) {
 
 function saveSettings() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+}
+
+function saveTasks() {
+  window.localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
 }
