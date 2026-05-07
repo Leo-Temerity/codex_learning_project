@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pomodoro Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="timer-panel" aria-labelledby="app-title">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Pomodoro</p>
+            <h1 id="app-title">Focus Dashboard</h1>
+          </div>
+          <div class="status-pill" id="sessionStatus">Focus 1 of 4</div>
+        </header>
+
+        <div class="flow-strip" aria-label="Pomodoro flow">
+          <div class="flow-step is-active" id="focusStep">
+            <span>1</span>
+            <strong>Focus</strong>
+          </div>
+          <div class="flow-step" id="shortBreakStep">
+            <span>2</span>
+            <strong>Short break</strong>
+          </div>
+          <div class="flow-step" id="longBreakStep">
+            <span>3</span>
+            <strong>Long break</strong>
+          </div>
+        </div>
+
+        <div class="timer-face" aria-live="polite">
+          <svg class="progress-ring" viewBox="0 0 220 220" aria-hidden="true">
+            <circle class="progress-track" cx="110" cy="110" r="96"></circle>
+            <circle class="progress-value" id="progressValue" cx="110" cy="110" r="96"></circle>
+          </svg>
+          <div class="timer-copy">
+            <p id="modeLabel">Focus</p>
+            <div class="time-display" id="timeDisplay">25:00</div>
+            <span id="timerState">Ready</span>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="Timer controls">
+          <button class="icon-button" type="button" id="resetButton" aria-label="Reset timer" title="Reset timer">
+            <span aria-hidden="true">↺</span>
+          </button>
+          <button class="primary-button" type="button" id="startPauseButton">Start</button>
+          <button class="icon-button" type="button" id="skipButton" aria-label="Skip to next mode" title="Skip to next mode">
+            <span aria-hidden="true">»</span>
+          </button>
+        </div>
+      </section>
+
+      <aside class="settings-panel" aria-labelledby="settings-title">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2 id="settings-title">Timer setup</h2>
+          </div>
+          <button class="quiet-button" type="button" id="restoreDefaultsButton">Defaults</button>
+        </div>
+
+        <form class="settings-form" id="settingsForm">
+          <label class="field">
+            <span>Focus minutes</span>
+            <input type="number" id="focusMinutes" min="1" max="180" step="1" inputmode="numeric">
+          </label>
+          <label class="field">
+            <span>Short break minutes</span>
+            <input type="number" id="shortBreakMinutes" min="1" max="60" step="1" inputmode="numeric">
+          </label>
+          <label class="field">
+            <span>Long break minutes</span>
+            <input type="number" id="longBreakMinutes" min="1" max="120" step="1" inputmode="numeric">
+          </label>
+          <label class="field">
+            <span>Focus rounds before long break</span>
+            <input type="number" id="roundsBeforeLongBreak" min="1" max="12" step="1" inputmode="numeric">
+          </label>
+
+          <label class="switch-row">
+            <span>
+              <strong>Auto-start next timer</strong>
+              <small id="autoStartCopy">Wait after each session</small>
+            </span>
+            <input type="checkbox" id="autoStartToggle">
+          </label>
+
+          <div class="notification-row">
+            <div>
+              <strong>Chrome alerts</strong>
+              <small id="notificationStatus">Sound is on</small>
+            </div>
+            <button class="quiet-button" type="button" id="notificationButton">Enable</button>
+          </div>
+        </form>
+
+        <div class="summary-grid" aria-label="Current session summary">
+          <div>
+            <span>Completed focus</span>
+            <strong id="completedFocus">0</strong>
+          </div>
+          <div>
+            <span>Focus progress</span>
+            <strong id="roundProgress">1 / 4</strong>
+          </div>
+          <div>
+            <span>Next up</span>
+            <strong id="nextMode">Short break</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

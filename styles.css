@@ -1,0 +1,462 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --panel: #fffdf8;
+  --panel-strong: #fff7e7;
+  --ink: #23262d;
+  --muted: #68707c;
+  --line: #ded8cd;
+  --focus: #2f6f6b;
+  --focus-dark: #194c49;
+  --break: #a44c42;
+  --long: #5a548f;
+  --accent: #e6b14d;
+  --shadow: 0 24px 70px rgba(35, 38, 45, 0.13);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    linear-gradient(135deg, rgba(47, 111, 107, 0.16), transparent 36%),
+    linear-gradient(315deg, rgba(164, 76, 66, 0.14), transparent 32%),
+    var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.app-shell {
+  width: min(1180px, calc(100% - 40px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.timer-panel,
+.settings-panel {
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(222, 216, 205, 0.9);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.timer-panel {
+  min-height: 680px;
+  padding: 32px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 28px;
+}
+
+.settings-panel {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.topbar,
+.panel-header,
+.notification-row,
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--focus);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  line-height: 0.95;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+.status-pill {
+  min-width: 112px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--panel);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.flow-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 247, 231, 0.72);
+}
+
+.flow-step {
+  min-height: 56px;
+  border-radius: 6px;
+  padding: 9px 12px;
+  color: var(--muted);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-weight: 800;
+}
+
+.flow-step span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(104, 112, 124, 0.14);
+  font-size: 0.78rem;
+}
+
+.flow-step.is-active {
+  color: #fff;
+  background: var(--focus);
+}
+
+body[data-mode="shortBreak"] .flow-step.is-active {
+  background: var(--break);
+}
+
+body[data-mode="longBreak"] .flow-step.is-active {
+  background: var(--long);
+}
+
+.flow-step.is-active span {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.timer-face {
+  position: relative;
+  min-height: 390px;
+  display: grid;
+  place-items: center;
+}
+
+.progress-ring {
+  width: min(430px, 78vw);
+  max-width: 100%;
+  aspect-ratio: 1;
+  transform: rotate(-90deg);
+}
+
+.progress-track,
+.progress-value {
+  fill: none;
+  stroke-width: 12;
+}
+
+.progress-track {
+  stroke: rgba(104, 112, 124, 0.16);
+}
+
+.progress-value {
+  stroke: var(--focus);
+  stroke-linecap: round;
+  stroke-dasharray: 603.19;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.35s ease, stroke 0.25s ease;
+}
+
+body[data-mode="shortBreak"] .progress-value {
+  stroke: var(--break);
+}
+
+body[data-mode="longBreak"] .progress-value {
+  stroke: var(--long);
+}
+
+.timer-copy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.timer-copy p,
+.timer-copy span {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.time-display {
+  min-width: 360px;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(4.4rem, 12vw, 8.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 64px minmax(180px, 260px) 64px;
+  justify-content: center;
+  gap: 12px;
+}
+
+.primary-button,
+.icon-button,
+.quiet-button {
+  border: 0;
+  border-radius: 8px;
+  font-weight: 900;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.primary-button {
+  min-height: 58px;
+  padding: 0 28px;
+  color: #fff;
+  background: var(--focus-dark);
+  box-shadow: 0 12px 24px rgba(25, 76, 73, 0.22);
+}
+
+.icon-button {
+  min-width: 64px;
+  min-height: 58px;
+  color: var(--ink);
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  font-size: 1.5rem;
+}
+
+.icon-button:disabled {
+  color: rgba(104, 112, 124, 0.55);
+  background: rgba(255, 247, 231, 0.52);
+}
+
+.quiet-button {
+  min-height: 38px;
+  padding: 0 14px;
+  color: var(--focus-dark);
+  background: #e8efe9;
+}
+
+.primary-button:hover,
+.icon-button:not(:disabled):hover,
+.quiet-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:focus-visible,
+.icon-button:focus-visible,
+.quiet-button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(230, 177, 77, 0.72);
+  outline-offset: 3px;
+}
+
+.settings-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.field input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fff;
+  font-weight: 900;
+}
+
+.switch-row,
+.notification-row {
+  min-height: 70px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 247, 231, 0.64);
+}
+
+.switch-row span,
+.notification-row div {
+  display: grid;
+  gap: 3px;
+}
+
+small {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.switch-row input {
+  appearance: none;
+  position: relative;
+  width: 52px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #cfd5d1;
+  transition: background 0.18s ease;
+}
+
+.switch-row input::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(35, 38, 45, 0.22);
+  transition: transform 0.18s ease;
+}
+
+.switch-row input:checked {
+  background: var(--focus);
+}
+
+.switch-row input:checked::after {
+  transform: translateX(22px);
+}
+
+.summary-grid {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-grid div {
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  display: grid;
+  align-content: space-between;
+}
+
+.summary-grid span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.summary-grid strong {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    width: min(680px, calc(100% - 28px));
+    padding: 24px 0;
+  }
+
+  .timer-panel {
+    min-height: 620px;
+  }
+}
+
+@media (max-width: 560px) {
+  .timer-panel,
+  .settings-panel {
+    padding: 20px;
+  }
+
+  .topbar,
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flow-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-face {
+    min-height: 320px;
+  }
+
+  .time-display {
+    min-width: 0;
+    font-size: 4.25rem;
+  }
+
+  .controls {
+    grid-template-columns: 56px minmax(0, 1fr) 56px;
+  }
+
+  .icon-button {
+    min-width: 56px;
+  }
+
+  .notification-row,
+  .switch-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
