@@ -184,7 +184,7 @@ body[data-mode="longBreak"] .flow-step.is-active {
   display: grid;
   place-items: center;
   --sand-top-scale: 1;
-  --sand-bottom-scale: 0.14;
+  --sand-bottom-scale: 0.04;
 }
 
 .hourglass {

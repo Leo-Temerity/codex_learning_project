@@ -236,7 +236,7 @@ function render() {
   const progress = totalSeconds === 0 ? 0 : 1 - remainingSeconds / totalSeconds;
   const clampedProgress = Math.min(Math.max(progress, 0), 1);
   const topSandScale = Math.max(0.08, 1 - clampedProgress);
-  const bottomSandScale = Math.max(0.14, clampedProgress);
+  const bottomSandScale = Math.max(0.04, clampedProgress);
 
   document.body.dataset.mode = currentMode;
   document.body.dataset.running = String(isRunning);
