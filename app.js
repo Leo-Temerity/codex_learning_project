@@ -428,7 +428,7 @@ function loadSettings() {
       focusMinutes: sanitizeStoredMinutes(parsed?.focusMinutes, defaults.focusMinutes, 1, 180),
       shortBreakMinutes: sanitizeStoredMinutes(parsed?.shortBreakMinutes, defaults.shortBreakMinutes, 1, 60),
       longBreakMinutes: sanitizeStoredMinutes(parsed?.longBreakMinutes, defaults.longBreakMinutes, 1, 120),
-      roundsBeforeLongBreak: sanitizeStoredMinutes(parsed?.roundsBeforeLongBreak, defaults.roundsBeforeLongBreak, 1, 12),
+      roundsBeforeLongBreak: sanitizeStoredMinutes(parsed?.roundsBeforeLongBreak, defaults.roundsBeforeLongBreak, 1, 999),
       autoStart: Boolean(parsed?.autoStart),
       notificationsEnabled: Boolean(parsed?.notificationsEnabled),
     };
