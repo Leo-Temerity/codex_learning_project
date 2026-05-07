@@ -186,7 +186,7 @@ body[data-mode="longBreak"] .flow-step.is-active {
 }
 
 .progress-ring {
-  width: min(430px, 78vw);
+  width: min(420px, 72vw, 100%);
   max-width: 100%;
   aspect-ratio: 1;
   transform: rotate(-90deg);
@@ -220,13 +220,18 @@ body[data-mode="longBreak"] .progress-value {
 
 .timer-copy {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  width: min(420px, 72vw, 100%);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 8px;
+  gap: 10px;
   text-align: center;
   pointer-events: none;
+  container-type: inline-size;
 }
 
 .timer-copy p,
@@ -237,11 +242,13 @@ body[data-mode="longBreak"] .progress-value {
 }
 
 .time-display {
-  min-width: 360px;
+  max-width: 76cqw;
+  min-width: 0;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(4.4rem, 12vw, 8.5rem);
+  font-size: clamp(3.2rem, 20cqw, 5.7rem);
   font-weight: 900;
   line-height: 0.9;
+  white-space: nowrap;
 }
 
 .controls {
@@ -442,8 +449,7 @@ small {
   }
 
   .time-display {
-    min-width: 0;
-    font-size: 4.25rem;
+    font-size: clamp(3rem, 19cqw, 4.8rem);
   }
 
   .controls {
