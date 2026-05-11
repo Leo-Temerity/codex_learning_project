@@ -55,7 +55,8 @@ body[data-background="image"] {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -467,7 +468,8 @@ body[data-mode="longBreak"] .hourglass-state {
 .primary-button:focus-visible,
 .icon-button:focus-visible,
 .quiet-button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
   outline: 3px solid rgba(230, 177, 77, 0.72);
   outline-offset: 3px;
 }
@@ -489,7 +491,9 @@ input:focus-visible {
   gap: 10px;
 }
 
-.task-form input {
+.task-form input,
+.task-priority-select,
+.task-move-select {
   min-width: 0;
   min-height: 54px;
   border: 1px solid var(--line);
@@ -498,6 +502,10 @@ input:focus-visible {
   color: var(--ink);
   background: #fff;
   font-weight: 800;
+}
+
+.task-priority-select {
+  grid-column: 1 / -1;
 }
 
 .add-task-button {
@@ -526,6 +534,75 @@ input:focus-visible {
   font-size: 0.98rem;
 }
 
+.priority-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.priority-matrix[hidden] {
+  display: none;
+}
+
+.quadrant {
+  min-width: 0;
+  min-height: 132px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 247, 231, 0.5);
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.quadrant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quadrant-header strong {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.1;
+}
+
+.quadrant-header span {
+  min-width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: rgba(104, 112, 124, 0.13);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.quadrant small {
+  min-height: 30px;
+  line-height: 1.2;
+}
+
+.quadrant-empty {
+  min-height: 34px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.45);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.quadrant-empty[hidden] {
+  display: none;
+}
+
 .mini-button {
   min-height: 32px;
   padding: 0 10px;
@@ -551,6 +628,13 @@ input:focus-visible {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
+}
+
+.quadrant .task-item {
+  min-height: 0;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  padding: 10px;
 }
 
 .task-item.is-cut {
@@ -591,6 +675,13 @@ input:focus-visible {
 .task-action-button.quiet-button {
   font-size: 0.82rem;
   white-space: nowrap;
+}
+
+.task-move-select {
+  min-height: 38px;
+  flex: 1 1 104px;
+  padding: 0 8px;
+  font-size: 0.78rem;
 }
 
 .archive-task-button {
@@ -640,6 +731,9 @@ input:focus-visible {
 
 body[data-background="image"] .field input,
 body[data-background="image"] .task-form input,
+body[data-background="image"] .task-priority-select,
+body[data-background="image"] .task-move-select,
+body[data-background="image"] .quadrant,
 body[data-background="image"] .task-item,
 body[data-background="image"] .summary-grid div,
 body[data-background="image"] .status-pill {

@@ -107,6 +107,13 @@
             <button class="icon-button add-task-button" type="submit" aria-label="Add task" title="Add task">
               <span aria-hidden="true">+</span>
             </button>
+            <label class="visually-hidden" for="taskPrioritySelect">Starting quadrant</label>
+            <select class="task-priority-select" id="taskPrioritySelect" aria-label="Starting quadrant">
+              <option value="doNow">Do now</option>
+              <option value="schedule">Schedule</option>
+              <option value="delegate">Delegate</option>
+              <option value="later">Later</option>
+            </select>
           </form>
 
           <div class="task-lane" aria-live="polite">
@@ -114,7 +121,47 @@
               <strong>Active</strong>
               <span id="activeTaskSummary">0 items</span>
             </div>
-            <ul class="task-list" id="taskList"></ul>
+            <div class="priority-matrix" id="priorityMatrix">
+              <section class="quadrant" data-quadrant="doNow" aria-label="Do now tasks">
+                <div class="quadrant-header">
+                  <strong>Do now</strong>
+                  <span data-quadrant-count="doNow">0</span>
+                </div>
+                <small>Important + urgent</small>
+                <ul class="task-list" data-quadrant-list="doNow"></ul>
+                <p class="quadrant-empty" data-quadrant-empty="doNow">Empty</p>
+              </section>
+
+              <section class="quadrant" data-quadrant="schedule" aria-label="Schedule tasks">
+                <div class="quadrant-header">
+                  <strong>Schedule</strong>
+                  <span data-quadrant-count="schedule">0</span>
+                </div>
+                <small>Important + not urgent</small>
+                <ul class="task-list" data-quadrant-list="schedule"></ul>
+                <p class="quadrant-empty" data-quadrant-empty="schedule">Empty</p>
+              </section>
+
+              <section class="quadrant" data-quadrant="delegate" aria-label="Delegate tasks">
+                <div class="quadrant-header">
+                  <strong>Delegate</strong>
+                  <span data-quadrant-count="delegate">0</span>
+                </div>
+                <small>Urgent + lighter impact</small>
+                <ul class="task-list" data-quadrant-list="delegate"></ul>
+                <p class="quadrant-empty" data-quadrant-empty="delegate">Empty</p>
+              </section>
+
+              <section class="quadrant" data-quadrant="later" aria-label="Later tasks">
+                <div class="quadrant-header">
+                  <strong>Later</strong>
+                  <span data-quadrant-count="later">0</span>
+                </div>
+                <small>Low urgency</small>
+                <ul class="task-list" data-quadrant-list="later"></ul>
+                <p class="quadrant-empty" data-quadrant-empty="later">Empty</p>
+              </section>
+            </div>
             <p class="empty-state" id="emptyTasks">No active tasks</p>
           </div>
 

@@ -19,6 +19,22 @@ const MODES = {
   },
 };
 
+const QUADRANTS = {
+  doNow: {
+    label: "Do now",
+  },
+  schedule: {
+    label: "Schedule",
+  },
+  delegate: {
+    label: "Delegate",
+  },
+  later: {
+    label: "Later",
+  },
+};
+
+const DEFAULT_QUADRANT = "doNow";
 const STORAGE_KEY = "chrome-pomodoro-settings-v1";
 const TASKS_STORAGE_KEY = "chrome-pomodoro-tasks-v1";
 
@@ -64,9 +80,13 @@ const elements = {
   nextMode: document.querySelector("#nextMode"),
   taskForm: document.querySelector("#taskForm"),
   taskInput: document.querySelector("#taskInput"),
+  taskPrioritySelect: document.querySelector("#taskPrioritySelect"),
   taskCount: document.querySelector("#taskCount"),
   activeTaskSummary: document.querySelector("#activeTaskSummary"),
-  taskList: document.querySelector("#taskList"),
+  priorityMatrix: document.querySelector("#priorityMatrix"),
+  quadrantLists: document.querySelectorAll("[data-quadrant-list]"),
+  quadrantCounts: document.querySelectorAll("[data-quadrant-count]"),
+  quadrantEmptyStates: document.querySelectorAll("[data-quadrant-empty]"),
   cutTaskList: document.querySelector("#cutTaskList"),
   emptyTasks: document.querySelector("#emptyTasks"),
   emptyCutTasks: document.querySelector("#emptyCutTasks"),
@@ -101,7 +121,8 @@ function bindEvents() {
   elements.notificationButton.addEventListener("click", enableNotifications);
   elements.settingsForm.addEventListener("submit", (event) => event.preventDefault());
   elements.taskForm.addEventListener("submit", addTask);
-  elements.taskList.addEventListener("click", handleTaskListClick);
+  elements.priorityMatrix.addEventListener("click", handleTaskListClick);
+  elements.priorityMatrix.addEventListener("change", handleTaskMove);
   elements.cutTaskList.addEventListener("click", handleTaskListClick);
   elements.restoreLastTaskButton.addEventListener("click", restoreLastCutTask);
 
@@ -142,6 +163,7 @@ function addTask(event) {
   tasks.unshift({
     id: createTaskId(),
     title,
+    quadrant: getSafeQuadrant(elements.taskPrioritySelect.value),
     isCut: false,
     createdAt: Date.now(),
     cutAt: null,
@@ -150,6 +172,16 @@ function addTask(event) {
   elements.taskInput.value = "";
   saveTasks();
   renderTasks();
+}
+
+function handleTaskMove(event) {
+  const select = event.target.closest("select[data-task-action='move']");
+
+  if (!select) {
+    return;
+  }
+
+  moveTask(select.dataset.taskId, select.value);
 }
 
 function handleTaskListClick(event) {
@@ -188,6 +220,24 @@ function cutTask(taskId) {
       ...task,
       isCut: true,
       cutAt: Date.now(),
+    };
+  });
+
+  saveTasks();
+  renderTasks();
+}
+
+function moveTask(taskId, quadrant) {
+  const safeQuadrant = getSafeQuadrant(quadrant);
+
+  tasks = tasks.map((task) => {
+    if (task.id !== taskId || task.isCut) {
+      return task;
+    }
+
+    return {
+      ...task,
+      quadrant: safeQuadrant,
     };
   });
 
@@ -397,10 +447,30 @@ function renderTasks() {
   elements.taskCount.textContent = `${activeTasks.length} active`;
   elements.activeTaskSummary.textContent = `${activeTasks.length} ${activeTasks.length === 1 ? "item" : "items"}`;
   elements.emptyTasks.hidden = activeTasks.length > 0;
+  elements.priorityMatrix.hidden = activeTasks.length === 0;
   elements.emptyCutTasks.hidden = cutTasks.length > 0;
   elements.restoreLastTaskButton.disabled = cutTasks.length === 0;
-  elements.taskList.replaceChildren(...activeTasks.map((task) => createTaskElement(task)));
+  renderQuadrants(activeTasks);
   elements.cutTaskList.replaceChildren(...cutTasks.map((task) => createTaskElement(task)));
+}
+
+function renderQuadrants(activeTasks) {
+  elements.quadrantLists.forEach((list) => {
+    const quadrant = list.dataset.quadrantList;
+    const quadrantTasks = activeTasks.filter((task) => task.quadrant === quadrant);
+    list.replaceChildren(...quadrantTasks.map((task) => createTaskElement(task)));
+  });
+
+  elements.quadrantCounts.forEach((count) => {
+    const quadrant = count.dataset.quadrantCount;
+    const total = activeTasks.filter((task) => task.quadrant === quadrant).length;
+    count.textContent = total;
+  });
+
+  elements.quadrantEmptyStates.forEach((emptyState) => {
+    const quadrant = emptyState.dataset.quadrantEmpty;
+    emptyState.hidden = activeTasks.some((task) => task.quadrant === quadrant);
+  });
 }
 
 function createTaskElement(task) {
@@ -430,6 +500,7 @@ function createTaskElement(task) {
       }),
     );
   } else {
+    actions.append(createTaskMoveSelect(task));
     actions.append(
       createTaskActionButton({
         task,
@@ -444,6 +515,24 @@ function createTaskElement(task) {
   item.append(title, actions);
 
   return item;
+}
+
+function createTaskMoveSelect(task) {
+  const select = document.createElement("select");
+  select.className = "task-move-select";
+  select.dataset.taskId = task.id;
+  select.dataset.taskAction = "move";
+  select.setAttribute("aria-label", `Move ${task.title}`);
+
+  Object.entries(QUADRANTS).forEach(([quadrant, config]) => {
+    const option = document.createElement("option");
+    option.value = quadrant;
+    option.textContent = config.label;
+    option.selected = task.quadrant === quadrant;
+    select.append(option);
+  });
+
+  return select;
 }
 
 function createTaskActionButton({ task, action, label, title = label, className }) {
@@ -461,6 +550,10 @@ function createTaskActionButton({ task, action, label, title = label, className 
 
 function getActiveTasks() {
   return tasks.filter((task) => !task.isCut);
+}
+
+function getSafeQuadrant(quadrant) {
+  return Object.prototype.hasOwnProperty.call(QUADRANTS, quadrant) ? quadrant : DEFAULT_QUADRANT;
 }
 
 function getCutTasks() {
@@ -668,6 +761,7 @@ function loadTasks() {
       .map((task) => ({
         id: typeof task?.id === "string" ? task.id : createTaskId(),
         title: typeof task?.title === "string" ? task.title.trim() : "",
+        quadrant: getSafeQuadrant(task?.quadrant),
         isCut: Boolean(task?.isCut),
         createdAt: Number.isFinite(task?.createdAt) ? task.createdAt : Date.now(),
         cutAt: Number.isFinite(task?.cutAt) ? task.cutAt : null,
