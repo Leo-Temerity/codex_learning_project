@@ -32,6 +32,26 @@ body {
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
+  transition: background 0.28s ease, color 0.28s ease;
+}
+
+body[data-background="image"] {
+  --bg: #e9edf4;
+  --panel: rgba(250, 252, 255, 0.82);
+  --panel-strong: rgba(231, 238, 247, 0.88);
+  --ink: #1d2738;
+  --muted: #5d6b80;
+  --line: rgba(131, 150, 176, 0.34);
+  --focus: #516f9d;
+  --focus-dark: #223653;
+  --break: #9b5a67;
+  --long: #615b98;
+  --accent: #9ec5e6;
+  --shadow: 0 28px 80px rgba(25, 34, 50, 0.22);
+  background:
+    linear-gradient(135deg, rgba(81, 111, 157, 0.13), transparent 38%),
+    linear-gradient(315deg, rgba(155, 90, 103, 0.12), transparent 34%),
+    var(--bg);
 }
 
 button,
@@ -67,12 +87,28 @@ button:disabled {
   box-shadow: var(--shadow);
 }
 
+body[data-background="image"] .settings-panel,
+body[data-background="image"] .task-panel {
+  background: rgba(248, 251, 255, 0.74);
+  border-color: rgba(181, 196, 216, 0.6);
+  backdrop-filter: blur(9px);
+}
+
 .timer-panel {
   min-height: 680px;
   padding: 32px;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 28px;
+}
+
+body[data-background="image"] .timer-panel {
+  background:
+    linear-gradient(90deg, rgba(248, 251, 255, 0.71), rgba(248, 251, 255, 0.57) 48%, rgba(248, 251, 255, 0.36)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(199, 216, 236, 0.23)),
+    url("assets/sand-background.png") center / cover;
+  border-color: rgba(181, 196, 216, 0.68);
+  box-shadow: 0 28px 90px rgba(25, 34, 50, 0.24);
 }
 
 .side-stack {
@@ -150,6 +186,14 @@ h2 {
   background: rgba(255, 247, 231, 0.72);
 }
 
+body[data-background="image"] .flow-strip,
+body[data-background="image"] .switch-row,
+body[data-background="image"] .notification-row,
+body[data-background="image"] .empty-state,
+body[data-background="image"] .task-item.is-cut {
+  background: rgba(234, 241, 250, 0.7);
+}
+
 .flow-step {
   min-height: 56px;
   border-radius: 6px;
@@ -206,6 +250,12 @@ body[data-mode="longBreak"] .flow-step.is-active {
   filter: drop-shadow(0 18px 34px rgba(25, 76, 73, 0.14));
 }
 
+body[data-background="image"] .hourglass {
+  filter:
+    drop-shadow(0 22px 42px rgba(34, 54, 83, 0.24))
+    drop-shadow(0 0 26px rgba(199, 222, 246, 0.68));
+}
+
 .hourglass-cap {
   fill: url("#glassGlow");
   stroke: var(--focus);
@@ -260,6 +310,32 @@ body[data-mode="longBreak"] .flow-step.is-active {
 
 .sand-stream circle {
   fill: #b7dfda;
+}
+
+body[data-background="image"] #glassGlow stop:first-child {
+  stop-color: #ffffff;
+  stop-opacity: 0.9;
+}
+
+body[data-background="image"] #glassGlow stop:last-child {
+  stop-color: #c9ddf3;
+  stop-opacity: 0.58;
+}
+
+body[data-background="image"] #sandFill stop:first-child {
+  stop-color: #f2f8ff;
+}
+
+body[data-background="image"] #sandFill stop:last-child {
+  stop-color: #aac8e7;
+}
+
+body[data-background="image"] .sand-stream line {
+  stroke: #d6e8f8;
+}
+
+body[data-background="image"] .sand-stream circle {
+  fill: #d6e8f8;
 }
 
 body[data-running="true"] .sand-stream {
@@ -560,6 +636,15 @@ input:focus-visible {
   color: var(--ink);
   background: #fff;
   font-weight: 900;
+}
+
+body[data-background="image"] .field input,
+body[data-background="image"] .task-form input,
+body[data-background="image"] .task-item,
+body[data-background="image"] .summary-grid div,
+body[data-background="image"] .status-pill {
+  background: rgba(255, 255, 255, 0.74);
+  border-color: var(--line);
 }
 
 .switch-row,

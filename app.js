@@ -28,6 +28,7 @@ const defaults = {
   longBreakMinutes: 15,
   roundsBeforeLongBreak: 4,
   autoStart: false,
+  backgroundTheme: false,
   notificationsEnabled: false,
 };
 
@@ -52,6 +53,8 @@ const elements = {
   settingsForm: document.querySelector("#settingsForm"),
   autoStartToggle: document.querySelector("#autoStartToggle"),
   autoStartCopy: document.querySelector("#autoStartCopy"),
+  backgroundThemeToggle: document.querySelector("#backgroundThemeToggle"),
+  backgroundThemeCopy: document.querySelector("#backgroundThemeCopy"),
   notificationButton: document.querySelector("#notificationButton"),
   notificationStatus: document.querySelector("#notificationStatus"),
   restoreDefaultsButton: document.querySelector("#restoreDefaultsButton"),
@@ -109,6 +112,12 @@ function bindEvents() {
 
   elements.autoStartToggle.addEventListener("change", () => {
     settings.autoStart = elements.autoStartToggle.checked;
+    saveSettings();
+    render();
+  });
+
+  elements.backgroundThemeToggle.addEventListener("change", () => {
+    settings.backgroundTheme = elements.backgroundThemeToggle.checked;
     saveSettings();
     render();
   });
@@ -355,6 +364,7 @@ function render() {
 
   document.body.dataset.mode = currentMode;
   document.body.dataset.running = String(isRunning);
+  document.body.dataset.background = settings.backgroundTheme ? "image" : "default";
   elements.timerFace.style.setProperty("--sand-top-scale", topSandScale.toFixed(3));
   elements.timerFace.style.setProperty("--sand-bottom-scale", bottomSandScale.toFixed(3));
   elements.timeDisplay.textContent = formatTime(remainingSeconds);
@@ -373,6 +383,7 @@ function render() {
   elements.roundProgress.textContent = `${getCurrentRound()} / ${settings.roundsBeforeLongBreak}`;
   elements.sessionStatus.textContent = getSessionStatus();
   elements.autoStartCopy.textContent = settings.autoStart ? "Continue automatically" : "Wait after each session";
+  elements.backgroundThemeCopy.textContent = settings.backgroundTheme ? "Timer image on" : "Default dashboard";
 
   Object.entries(elements.flowSteps).forEach(([mode, step]) => {
     step.classList.toggle("is-active", mode === currentMode);
@@ -501,6 +512,7 @@ function syncSettingsForm() {
   elements.longBreakMinutes.value = settings.longBreakMinutes;
   elements.roundsBeforeLongBreak.value = settings.roundsBeforeLongBreak;
   elements.autoStartToggle.checked = settings.autoStart;
+  elements.backgroundThemeToggle.checked = settings.backgroundTheme;
 }
 
 function restoreDefaults() {
@@ -636,6 +648,7 @@ function loadSettings() {
       longBreakMinutes: sanitizeStoredMinutes(parsed?.longBreakMinutes, defaults.longBreakMinutes, 1, 120),
       roundsBeforeLongBreak: sanitizeStoredMinutes(parsed?.roundsBeforeLongBreak, defaults.roundsBeforeLongBreak, 1, 999),
       autoStart: Boolean(parsed?.autoStart),
+      backgroundTheme: Boolean(parsed?.backgroundTheme),
       notificationsEnabled: Boolean(parsed?.notificationsEnabled),
     };
   } catch {
