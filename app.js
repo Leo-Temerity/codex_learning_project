@@ -124,12 +124,14 @@ function bindEvents() {
   elements.taskForm.addEventListener("submit", addTask);
   elements.priorityMatrix.addEventListener("click", handleTaskListClick);
   elements.priorityMatrix.addEventListener("change", handleTaskMove);
+  elements.priorityMatrix.addEventListener("dblclick", handleTaskTitleEdit);
   elements.priorityMatrix.addEventListener("dragstart", handleTaskDragStart);
   elements.priorityMatrix.addEventListener("dragend", handleTaskDragEnd);
   elements.priorityMatrix.addEventListener("dragover", handleQuadrantDragOver);
   elements.priorityMatrix.addEventListener("dragleave", handleQuadrantDragLeave);
   elements.priorityMatrix.addEventListener("drop", handleQuadrantDrop);
   elements.cutTaskList.addEventListener("click", handleTaskListClick);
+  elements.cutTaskList.addEventListener("dblclick", handleTaskTitleEdit);
   elements.restoreLastTaskButton.addEventListener("click", restoreLastCutTask);
 
   [elements.focusMinutes, elements.shortBreakMinutes, elements.longBreakMinutes, elements.roundsBeforeLongBreak].forEach((input) => {
@@ -193,7 +195,7 @@ function handleTaskMove(event) {
 function handleTaskDragStart(event) {
   const item = event.target.closest(".task-item[data-task-id]");
 
-  if (!item || item.dataset.cut === "true") {
+  if (!item || item.dataset.cut === "true" || event.target.closest("button, input, select")) {
     event.preventDefault();
     return;
   }
@@ -244,6 +246,77 @@ function handleQuadrantDrop(event) {
   event.preventDefault();
   quadrant.classList.remove("is-drop-target");
   moveTask(taskId, quadrant.dataset.quadrant);
+}
+
+function handleTaskTitleEdit(event) {
+  const title = event.target.closest(".task-title");
+
+  if (!title) {
+    return;
+  }
+
+  const item = title.closest(".task-item[data-task-id]");
+
+  if (!item) {
+    return;
+  }
+
+  startTaskTitleEdit(item, title);
+}
+
+function startTaskTitleEdit(item, title) {
+  const task = tasks.find((currentTask) => currentTask.id === item.dataset.taskId);
+
+  if (!task || item.classList.contains("is-editing")) {
+    return;
+  }
+
+  const input = document.createElement("input");
+  input.className = "task-title-input";
+  input.type = "text";
+  input.maxLength = 90;
+  input.value = task.title;
+  input.setAttribute("aria-label", `Edit ${task.title}`);
+
+  let isFinished = false;
+  const wasDraggable = item.draggable;
+
+  item.classList.add("is-editing");
+  item.draggable = false;
+  title.replaceWith(input);
+  input.focus();
+  input.select();
+
+  const finish = (shouldSave) => {
+    if (isFinished) {
+      return;
+    }
+
+    isFinished = true;
+    const nextTitle = input.value.trim().replace(/\s+/g, " ");
+    item.classList.remove("is-editing");
+    item.draggable = wasDraggable;
+
+    if (shouldSave && nextTitle) {
+      updateTaskTitle(task.id, nextTitle);
+      return;
+    }
+
+    renderTasks();
+  };
+
+  input.addEventListener("blur", () => finish(true));
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finish(true);
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  });
 }
 
 function handleTaskListClick(event) {
@@ -300,6 +373,22 @@ function moveTask(taskId, quadrant) {
     return {
       ...task,
       quadrant: safeQuadrant,
+    };
+  });
+
+  saveTasks();
+  renderTasks();
+}
+
+function updateTaskTitle(taskId, title) {
+  tasks = tasks.map((task) => {
+    if (task.id !== taskId) {
+      return task;
+    }
+
+    return {
+      ...task,
+      title,
     };
   });
 
@@ -549,6 +638,7 @@ function createTaskElement(task) {
   const title = document.createElement("span");
   title.className = "task-title";
   title.textContent = task.title;
+  title.title = "Double-click to edit";
 
   const actions = document.createElement("div");
   actions.className = "task-actions";
