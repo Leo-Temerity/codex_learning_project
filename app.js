@@ -102,6 +102,7 @@ let remainingSeconds = getModeSeconds(currentMode);
 let timerId = null;
 let completedFocusCount = 0;
 let audioContext = null;
+let draggedTaskId = null;
 
 initialize();
 
@@ -123,6 +124,11 @@ function bindEvents() {
   elements.taskForm.addEventListener("submit", addTask);
   elements.priorityMatrix.addEventListener("click", handleTaskListClick);
   elements.priorityMatrix.addEventListener("change", handleTaskMove);
+  elements.priorityMatrix.addEventListener("dragstart", handleTaskDragStart);
+  elements.priorityMatrix.addEventListener("dragend", handleTaskDragEnd);
+  elements.priorityMatrix.addEventListener("dragover", handleQuadrantDragOver);
+  elements.priorityMatrix.addEventListener("dragleave", handleQuadrantDragLeave);
+  elements.priorityMatrix.addEventListener("drop", handleQuadrantDrop);
   elements.cutTaskList.addEventListener("click", handleTaskListClick);
   elements.restoreLastTaskButton.addEventListener("click", restoreLastCutTask);
 
@@ -182,6 +188,62 @@ function handleTaskMove(event) {
   }
 
   moveTask(select.dataset.taskId, select.value);
+}
+
+function handleTaskDragStart(event) {
+  const item = event.target.closest(".task-item[data-task-id]");
+
+  if (!item || item.dataset.cut === "true") {
+    event.preventDefault();
+    return;
+  }
+
+  draggedTaskId = item.dataset.taskId;
+  item.classList.add("is-dragging");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", draggedTaskId);
+}
+
+function handleTaskDragEnd() {
+  draggedTaskId = null;
+  elements.priorityMatrix.querySelectorAll(".is-dragging, .is-drop-target").forEach((element) => {
+    element.classList.remove("is-dragging", "is-drop-target");
+  });
+}
+
+function handleQuadrantDragOver(event) {
+  const quadrant = event.target.closest(".quadrant[data-quadrant]");
+
+  if (!quadrant || !draggedTaskId) {
+    return;
+  }
+
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  quadrant.classList.add("is-drop-target");
+}
+
+function handleQuadrantDragLeave(event) {
+  const quadrant = event.target.closest(".quadrant[data-quadrant]");
+
+  if (!quadrant || quadrant.contains(event.relatedTarget)) {
+    return;
+  }
+
+  quadrant.classList.remove("is-drop-target");
+}
+
+function handleQuadrantDrop(event) {
+  const quadrant = event.target.closest(".quadrant[data-quadrant]");
+  const taskId = event.dataTransfer.getData("text/plain") || draggedTaskId;
+
+  if (!quadrant || !taskId) {
+    return;
+  }
+
+  event.preventDefault();
+  quadrant.classList.remove("is-drop-target");
+  moveTask(taskId, quadrant.dataset.quadrant);
 }
 
 function handleTaskListClick(event) {
@@ -476,6 +538,13 @@ function renderQuadrants(activeTasks) {
 function createTaskElement(task) {
   const item = document.createElement("li");
   item.className = task.isCut ? "task-item is-cut" : "task-item";
+  item.dataset.taskId = task.id;
+  item.dataset.cut = String(task.isCut);
+  item.draggable = !task.isCut;
+
+  if (!task.isCut) {
+    item.title = `Drag to move ${task.title}`;
+  }
 
   const title = document.createElement("span");
   title.className = "task-title";

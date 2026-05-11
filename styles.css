@@ -107,7 +107,8 @@ body[data-background="image"] .timer-panel {
   background:
     linear-gradient(90deg, rgba(248, 251, 255, 0.71), rgba(248, 251, 255, 0.57) 48%, rgba(248, 251, 255, 0.36)),
     linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(199, 216, 236, 0.23)),
-    url("assets/sand-background.png") center / cover;
+    url("assets/sand-background.png") center / contain no-repeat;
+  background-color: rgba(232, 238, 247, 0.9);
   border-color: rgba(181, 196, 216, 0.68);
   box-shadow: 0 28px 90px rgba(25, 34, 50, 0.24);
 }
@@ -244,7 +245,22 @@ body[data-mode="longBreak"] .flow-step.is-active {
   --sand-bottom-scale: 0.04;
 }
 
+body[data-background="image"] .timer-face::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(560px, 96%);
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(ellipse, rgba(248, 251, 255, 0.94) 0%, rgba(248, 251, 255, 0.86) 42%, rgba(248, 251, 255, 0.24) 70%, rgba(248, 251, 255, 0) 82%);
+  pointer-events: none;
+}
+
 .hourglass {
+  position: relative;
+  z-index: 1;
   width: min(500px, 75vw, 100%);
   max-width: 100%;
   aspect-ratio: 260 / 380;
@@ -269,6 +285,10 @@ body[data-background="image"] .hourglass {
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+body[data-background="image"] .hourglass-glass {
+  fill: rgba(255, 255, 255, 0.86);
 }
 
 .hourglass-sand {
@@ -320,7 +340,7 @@ body[data-background="image"] #glassGlow stop:first-child {
 
 body[data-background="image"] #glassGlow stop:last-child {
   stop-color: #c9ddf3;
-  stop-opacity: 0.58;
+  stop-opacity: 0.82;
 }
 
 body[data-background="image"] #sandFill stop:first-child {
@@ -365,7 +385,8 @@ body[data-mode="longBreak"] .hourglass-glass {
 
 .timer-copy {
   position: absolute;
-  top: 31.5%;
+  z-index: 2;
+  top: 35%;
   left: 50%;
   width: min(340px, 52vw, 72%);
   transform: translate(-50%, -50%);
@@ -397,6 +418,7 @@ body[data-mode="longBreak"] .hourglass-state {
 
 .hourglass-state {
   position: absolute;
+  z-index: 2;
   top: 67%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -408,7 +430,7 @@ body[data-mode="longBreak"] .hourglass-state {
   max-width: 100cqw;
   min-width: 0;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(2.8rem, 20cqw, 5.2rem);
+  font-size: clamp(2.8rem, 18cqw, 4.6rem);
   font-weight: 900;
   line-height: 0.9;
   white-space: nowrap;
@@ -554,6 +576,13 @@ select:focus-visible {
   display: grid;
   align-content: start;
   gap: 8px;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.quadrant.is-drop-target {
+  border-color: var(--focus);
+  background: rgba(232, 239, 233, 0.86);
+  box-shadow: inset 0 0 0 2px rgba(47, 111, 107, 0.14);
 }
 
 .quadrant-header {
@@ -635,6 +664,19 @@ select:focus-visible {
   grid-template-columns: 1fr;
   gap: 9px;
   padding: 10px;
+}
+
+.quadrant .task-item[draggable="true"] {
+  cursor: grab;
+}
+
+.quadrant .task-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.task-item.is-dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
 }
 
 .task-item.is-cut {
@@ -823,6 +865,16 @@ small {
   line-height: 1;
 }
 
+@media (min-width: 901px) {
+  body[data-background="image"] .timer-copy {
+    top: 41%;
+  }
+
+  body[data-background="image"] .hourglass-state {
+    top: 60%;
+  }
+}
+
 @media (max-width: 900px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -832,10 +884,6 @@ small {
 
   .timer-panel {
     min-height: 620px;
-  }
-
-  .side-stack {
-    grid-template-columns: 1fr;
   }
 }
 
