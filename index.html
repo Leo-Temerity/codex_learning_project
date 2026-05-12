@@ -33,7 +33,7 @@
         </div>
 
         <div class="timer-face" aria-live="polite">
-          <svg class="hourglass" viewBox="0 0 260 380" aria-hidden="true">
+          <svg class="hourglass" viewBox="0 0 260 380">
             <defs>
               <clipPath id="topBulbClip">
                 <path d="M48 52 C31 86 38 121 66 151 C82 168 111 177 121 196 C125 203 126 210 130 222 C134 210 135 203 139 196 C149 177 178 168 194 151 C222 121 229 86 212 52 Z"></path>
@@ -72,12 +72,13 @@
               <circle cx="130" cy="286" r="2.5"></circle>
               <circle cx="130" cy="312" r="2.5"></circle>
             </g>
+
+            <g class="timer-svg-copy">
+              <text class="timer-mode-text" id="modeLabel" x="130" y="118" text-anchor="middle">Focus</text>
+              <text class="time-display" id="timeDisplay" x="130" y="146" text-anchor="middle">25:00</text>
+              <text class="hourglass-state" id="timerState" x="130" y="260" text-anchor="middle">Ready</text>
+            </g>
           </svg>
-          <div class="timer-copy">
-            <p id="modeLabel">Focus</p>
-            <div class="time-display" id="timeDisplay">25:00</div>
-          </div>
-          <span class="hourglass-state" id="timerState">Ready</span>
         </div>
 
         <div class="controls" aria-label="Timer controls">
