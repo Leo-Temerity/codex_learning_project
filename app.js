@@ -648,7 +648,7 @@ function createTaskElement(task) {
       createTaskActionButton({
         task,
         action: "restore",
-        label: "Put back",
+        label: "Restore",
         className: "quiet-button task-action-button",
       }),
       createTaskActionButton({
@@ -664,8 +664,8 @@ function createTaskElement(task) {
       createTaskActionButton({
         task,
         action: "cut",
-        label: "✂",
-        title: "Cut out",
+        label: "✓",
+        title: "Mark finished",
         className: "icon-button task-action-button",
       }),
     );

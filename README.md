@@ -1,6 +1,6 @@
 # Pomodoro Dashboard
 
-A static Pomodoro dashboard with configurable focus rounds, persistent timer settings, completion sound, optional browser notifications, and a task board for adding, cutting out, restoring, and permanently archiving tasks.
+A static Pomodoro dashboard with configurable focus rounds, persistent timer settings, completion sound, optional browser notifications, and a priority board for adding, finishing, restoring, and permanently archiving tasks.
 
 ## Dependencies
 
@@ -42,4 +42,4 @@ http://localhost:8000/
 
 - `index.html` - app markup
 - `styles.css` - dashboard layout and visual styling
-- `app.js` - timer, task board, persistence, audio, and notification behavior
+- `app.js` - timer, priority board, persistence, audio, and notification behavior

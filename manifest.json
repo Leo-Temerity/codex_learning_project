@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Pomodoro Dashboard",
+  "version": "1.0.0",
+  "description": "A Pomodoro timer with a priority task board.",
+  "action": {
+    "default_title": "Pomodoro Dashboard",
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "notifications"
+  ]
+}
